@@ -100,9 +100,28 @@ class Snail(
     }
 }
 
-class Aquarium(val name: String, val capacity: Int) {
+open class Aquarium(val name: String, val capacity: Int, open var length: Int = 100, open var width: Int = 20, open var height: Int = 40) {
     private val inhabitants = mutableListOf<AquariumCreature>()
     private var cleanliness: Int = 100
+    open val shape = "прямоугольный"
+
+    open var volume: Int
+        get() = width * height * length / 1000
+        set(value) {
+            height = (value * 1000) / (width * length)
+        }
+
+    open val water: Double
+        get() = volume * 0.9
+
+    fun printSize() {
+        println("Ширина: $width см " +
+                "Длина: $length см " +
+                "Высота: $height см ")
+
+        println("Объем: $volume литров; Воды: $water литров (${water / volume * 100.0}% заполненность)")
+        println("Аквариум $shape формы")
+    }
 
     fun addInhabitant(creature: AquariumCreature): Boolean {
         return if (inhabitants.size < capacity) {
@@ -161,6 +180,16 @@ class Aquarium(val name: String, val capacity: Int) {
     }
 }
 
+class TowerTank (override var height: Int, var diameter: Int): Aquarium(height = height, width = diameter, length = diameter, name = "Cool", capacity = 100) {
+    override var volume: Int
+        get() = (width/2 * length/2 * height / 1000 * 3).toInt()
+        set(value) {
+            height = ((value * 1000 / 3) / (width/2 * length/2)).toInt()
+        }
+    override var water = volume * 0.8
+    override val shape = "цилиндровой"
+}
+
 fun List<AquariumCreature>.findAllByColor(color: String): List<AquariumCreature> {
     return this.filter { it.isColor(color) }
 }
@@ -170,7 +199,13 @@ fun List<AquariumCreature>.countHealthy(): Int {
 }
 
 fun main() {
-    val myAquarium = Aquarium("Морские глубины", 10)
+    val myAquarium = Aquarium("Морские глубины", 10, 50, 50, 50)
+    val myAquarium1 = TowerTank (100, 50)
+
+    myAquarium.printSize()
+    println()
+    myAquarium1.printSize()
+    println()
 
     val nemo = Fish("Немо", "оранжевый", "клоун")
     val dory = Fish("Дори", "синий", "хирург")
@@ -241,4 +276,5 @@ fun main() {
 
     println("\n=== Финальный статус ===")
     myAquarium.showStatus()
+
 }
